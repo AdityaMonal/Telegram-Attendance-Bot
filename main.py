@@ -46,6 +46,7 @@ class attendance:
                 dtString = now.strftime('(%d/%m/%y)')
 
                 f.writelines(f'\n{name},{dtString}')
+            f.writelines(f'\n')
 
     def train(self):
         path = r"C:\Users\Harishith\Downloads\MAJOR PROJECTOG\MAJOR PROJECT\Training_images\\" + self.sec
@@ -120,3 +121,23 @@ class attendance:
                     #     if cv2.waitKey(1) & 0xff == ord('q'):
                     #         break
         return marked
+    def getAttendance(self,sec):
+        reg = {}
+        marked=""""""
+        with open(sec + '\\attendance.csv', 'r+') as f:
+            dataList = f.readlines()
+            c=1
+            for line in dataList:
+                if c==1:
+                    c+=1
+                    continue
+                date=line.split(',')[-1][1:-2]
+                if date not in reg:
+                    reg[date]=[line.split(',')[0]]
+                else:
+                    reg[date].append(line.split(',')[0])
+        for key in reg:
+            marked+=key+'\n'+"-----------------\n"+'\n'.join(reg[key])+'\n'+"-----------------\n"+"total: "+str(len(reg[key]))+'\n\n'
+        return marked
+
+

@@ -84,4 +84,26 @@ def triggerAttendance(message):
         marked+=name+"""\n"""
 
     bot.send_message(message.chat.id, marked)
+
+
+@bot.message_handler(commands=["getAttendance"])
+def getAttendance(message1):
+    bot.send_message(message1.chat.id, "enter class name")
+    class i:
+        c=True
+        sec=''
+    def section(message):
+
+        i.sec=message.text.split()[0].upper()
+        if message.text.split()[0].upper() in ["ITB4","ITC4"] and i.c:
+            i.c=False
+            return True
+        else:
+            return False
+    @bot.message_handler(func=section)
+    def retrieveAttendance(message):
+        marked=attender.getAttendance(i.sec)
+        bot.send_message(message.chat.id, marked)
+
+    # bot.polling()
 bot.polling()

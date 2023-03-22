@@ -43,7 +43,7 @@ class attendance:
 
             if name not in nameList:
                 now = datetime.now()
-                dtString = now.strftime('%a,(%b/%d/%y)')
+                dtString = now.strftime('(%d/%m/%y)')
 
                 f.writelines(f'\n{name},{dtString}')
 
@@ -80,6 +80,7 @@ class attendance:
         inpPath = r"C:\Users\Harishith\Downloads\MAJOR PROJECTOG\MAJOR PROJECT\input_images"
         myInps = os.listdir(inpPath)
         # print(myInps)
+        marked=[]
         for cl in myInps:
             # print(os.path.splitext(cl)[0])
             fileno = int(os.path.splitext(cl)[0][5:])
@@ -88,8 +89,8 @@ class attendance:
                 continue
 
             img = cv2.imread(f'{inpPath}\{cl}')
-            imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
-            imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
+            # imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
+            imgS = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             facesCurFrame = face_recognition.face_locations(imgS)
             encodesCurFrame = face_recognition.face_encodings(imgS, facesCurFrame)
@@ -110,9 +111,12 @@ class attendance:
                     # cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     # cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
                     # cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+                    if name not in marked:
+                        marked.append(name)
                     self.markAttendance(name)
                     # while True:
                     #     imgK = cv2.resize(imgS, (960, 540))
                     #     cv2.imshow('lol', imgK)
                     #     if cv2.waitKey(1) & 0xff == ord('q'):
                     #         break
+        return marked

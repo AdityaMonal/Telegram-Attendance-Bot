@@ -49,10 +49,11 @@ def startText(message):
 @bot.message_handler(func=startText)
 def startAttendance(message):
     attender.sec=count.sec
+    count.start = count.i+1
     attender.initiate()
     bot.send_message(message.chat.id, "Upload class Photos")
 
-    count.start=count.i
+
 
 @bot.message_handler(content_types=['photo'])
 def classPhotos(message):
@@ -76,21 +77,11 @@ def triggerText(message):
 @bot.message_handler(func=triggerText)
 def triggerAttendance(message):
     count.end = count.i
-    attender.execute(count.start,count.end)
+    markedNames=attender.execute(count.start,count.end)
     marked = """"""
-    with open(count.sec+'\\attendance.csv', 'r+') as f:
-        myDataList = f.readlines()
 
-        # nameList = []
-        # print(myDataList)
-        c=1
-        for line in myDataList:
-            if c>=1:
-                c-=1
-                continue
-            entry = line.split(',')
-            # nameList.append(entry[0])
-            marked+=entry[0]+"""\n"""
+    for name in markedNames:
+        marked+=name+"""\n"""
 
     bot.send_message(message.chat.id, marked)
 bot.polling()

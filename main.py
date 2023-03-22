@@ -5,12 +5,13 @@ import os
 from datetime import datetime
 import csv
 import joblib
+import constants
 
 
 # from PIL import ImageGrab
 
 class attendance:
-    # path = r"C:\Users\Harishith\Downloads\MAJOR PROJECTOG\MAJOR PROJECT\Training_images"
+    path = constants.path
     images = []
     name = []
     classNames = []
@@ -32,7 +33,7 @@ class attendance:
         # print("bruh")
         with open(self.sec+'\\attendance.csv', 'a+') as f:
             if os.stat(self.sec+'\\attendance.csv').st_size == 0:
-                f.write("Name,Date")
+                f.write("Name,Date\n")
             f.seek(0)
             myDataList = f.readlines()
             nameList = []
@@ -45,11 +46,11 @@ class attendance:
                 now = datetime.now()
                 dtString = now.strftime('(%d/%m/%y)')
 
-                f.writelines(f'\n{name},{dtString}')
-            f.writelines(f'\n')
+                f.writelines(f'{name},{dtString}\n')
+            # f.writelines(f'\n')
 
     def train(self):
-        path = r"C:\Users\Harishith\Downloads\MAJOR PROJECTOG\MAJOR PROJECT\Training_images\\" + self.sec
+        path = self.path+"\Training_images\\" + self.sec
         myList = os.listdir(path)
         classNames = []
         print(myList)
@@ -78,7 +79,7 @@ class attendance:
         print(self.encodeListKnown)
 
     def execute(self, start=1, end=1):
-        inpPath = r"C:\Users\Harishith\Downloads\MAJOR PROJECTOG\MAJOR PROJECT\input_images"
+        inpPath = self.path+"\input_images"
         myInps = os.listdir(inpPath)
         # print(myInps)
         marked=[]

@@ -1,2 +1,2 @@
-API_KEY = "{API_KEY}"
-path = r"<path>"
+API_KEY = "{Api_key}"
+path = r"{path}"

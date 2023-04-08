@@ -36,6 +36,7 @@ class count:
     req = True
     datereq = True
     date = ""
+    response=False
 @bot.message_handler(commands=["markAttendance"])
 def markAttendance(message):
     # class count:
@@ -121,8 +122,21 @@ def markAttendance(message):
                 marked += name+'\n'
             if len(marked) > 0:
                 bot.send_message(message.chat.id, marked)
+                count.response=True
+                bot.send_message(message.chat.id, "To get dected faces: /detected ")
             else:
                 bot.send_message(message.chat.id, "Barrrrrh")
+
+    @bot.message_handler(commands=["detected"])
+    def returnMarked(message):
+        if count.response :
+            count.response=False
+            outPath = key.path + "\output_images"
+            for cl in range(count.start, count.end+1):
+                imgName = f'{outPath}\image{cl}.jpg'
+                pic = open(imgName, 'rb')
+                bot.send_photo(message.chat.id,pic)
+
 
 
 @bot.message_handler(commands=["getAttendance"])

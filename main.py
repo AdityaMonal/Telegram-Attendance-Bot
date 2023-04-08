@@ -124,11 +124,15 @@ class attendance:
                         self.markAttendance(name, datetime.strptime(dat, '%d/%m/%y'))
                     else:
                         self.markAttendance(name)
-            while True:
-                imgK = cv2.resize(img, (960, 540))
-                cv2.imshow('lol', imgK)
-                if cv2.waitKey(1) & 0xff == ord('q'):
-                    break
+            # while True:
+            #     imgK = cv2.resize(img, (960, 540))
+            #     cv2.imshow('lol', imgK)
+            #     if cv2.waitKey(1) & 0xff == ord('q'):
+            #         break
+            if not os.path.exists("output_images"):
+                os.mkdir("output_images")
+            pat = "output_images\image" + str(cl) + ".jpg"
+            cv2.imwrite(pat, img)
         return marked
     def getAttendance(self,sec):
         reg = {}

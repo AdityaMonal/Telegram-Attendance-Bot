@@ -5,12 +5,13 @@ import os
 from datetime import datetime
 import csv
 import joblib
+import constants
 
 
 # from PIL import ImageGrab
 
 class attendance:
-    # path = r"C:\Users\Harishith\Downloads\MAJOR PROJECTOG\MAJOR PROJECT\Training_images"
+    path = constants.path
     images = []
     name = []
     classNames = []
@@ -28,27 +29,31 @@ class attendance:
             encodeList.append(encode)
         return encodeList
 
-    def markAttendance(self, name):
+    def markAttendance(self, name, now=datetime.now()):
         # print("bruh")
         with open(self.sec+'\\attendance.csv', 'a+') as f:
             if os.stat(self.sec+'\\attendance.csv').st_size == 0:
-                f.write("Name,Date")
+                f.write("Name,Date\n")
             f.seek(0)
             myDataList = f.readlines()
             nameList = []
+            # now = datetime(2023,3,22)
+            dtString = now.strftime('(%d/%m/%y)')
+            namedate = f'{name},{dtString}\n'
             # print(myDataList)
             for line in myDataList:
-                entry = line.split(',')
-                nameList.append(entry[0])
+                # entry = line.split(',')
+                nameList.append(line)
 
-            if name not in nameList:
-                now = datetime.now()
-                dtString = now.strftime('(%d/%m/%y)')
+            if namedate not in nameList:
+                # now = datetime.now()
+                # dtString = now.strftime('(%d/%m/%y)')
 
-                f.writelines(f'\n{name},{dtString}')
+                f.writelines(namedate)
+            # f.writelines(f'\n')
 
     def train(self):
-        path = r"C:\Users\Harishith\Downloads\MAJOR PROJECTOG\MAJOR PROJECT\Training_images\\" + self.sec
+        path = self.path+"\Training_images\\" + self.sec
         myList = os.listdir(path)
         classNames = []
         print(myList)
@@ -76,19 +81,21 @@ class attendance:
         print(self.classNames)
         print(self.encodeListKnown)
 
-    def execute(self, start=1, end=1):
-        inpPath = r"C:\Users\Harishith\Downloads\MAJOR PROJECTOG\MAJOR PROJECT\input_images"
+    def execute(self, start=1, end=1, dat=""):
+        inpPath = self.path+"\input_images"
         myInps = os.listdir(inpPath)
         # print(myInps)
         marked=[]
-        for cl in myInps:
+        for cl in range(start, end+1):
             # print(os.path.splitext(cl)[0])
-            fileno = int(os.path.splitext(cl)[0][5:])
-            # print(fileno)
-            if fileno < start or fileno > end:
-                continue
-
-            img = cv2.imread(f'{inpPath}\{cl}')
+            # fileno = int(os.path.splitext(cl)[0][5:])
+            # # print(fileno)
+            # if fileno < start or fileno > end:
+            #     continue
+            print(cl)
+            imgName=f'{inpPath}\image{cl}.jpg'
+            print(imgName)
+            img = cv2.imread(imgName)
             # imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
             imgS = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -113,10 +120,33 @@ class attendance:
                     # cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
                     if name not in marked:
                         marked.append(name)
-                    self.markAttendance(name)
+                    if len(dat) > 0:
+                        self.markAttendance(name, datetime.strptime(dat, '%d/%m/%y'))
+                    else:
+                        self.markAttendance(name)
                     # while True:
                     #     imgK = cv2.resize(imgS, (960, 540))
                     #     cv2.imshow('lol', imgK)
                     #     if cv2.waitKey(1) & 0xff == ord('q'):
                     #         break
         return marked
+    def getAttendance(self,sec):
+        reg = {}
+        marked=""""""
+        with open(sec + '\\attendance.csv', 'r+') as f:
+            dataList = f.readlines()
+            c=1
+            for line in dataList:
+                if c==1:
+                    c+=1
+                    continue
+                date=line.split(',')[-1][1:-2]
+                if date not in reg:
+                    reg[date]=[line.split(',')[0]]
+                else:
+                    reg[date].append(line.split(',')[0])
+        for key in reg:
+            marked += key+'\n'+"-----------------\n"+'\n'.join(reg[key])+'\n'+"-----------------\n"+"total: "+str(len(reg[key]))+'\n\n'
+        return marked
+
+

@@ -5,7 +5,9 @@ import constants as key
 from main import attendance
 import datetime
 bot = telebot.TeleBot(key.API_KEY)
-
+with open('resources\\user_ids.txt', 'r') as tfile:
+    authIds = tfile.readline().split(',')
+print(authIds)
 @bot.message_handler(commands=["start"])
 def startup(message):
     bot.send_message(message.chat.id, "Mark : /markAttendance\nGet : /getAttendance")
@@ -30,11 +32,11 @@ def sendVjit(message):
 
 class count:
     sec = ""
-    start = 0
-    end = 0
-    i = 0
-    req = True
-    datereq = True
+    # start = 0
+    # end = 0
+    # i = 0
+    req = False
+    datereq = False
     date = ""
     response=False
 class imNo:
@@ -45,6 +47,7 @@ attender = {}
 @bot.message_handler(commands=["markAttendance"])
 def markAttendance(message):
     # class count:
+
     marker[message.from_user.id] = count()
     attender[message.from_user.id] = attendance()
     marker[message.from_user.id].sec = ""
@@ -52,6 +55,10 @@ def markAttendance(message):
     # marker[message.from_user.id].start = 0
     # marker[message.from_user.id].end = 0
     # marker[message.from_user.id].i = 0
+    print(message.from_user.id, authIds)
+    if str(message.from_user.id) not in authIds:
+        bot.send_message(message.chat.id, "Verify that you are faculty first:\n/authenticate")
+        return
     marker[message.from_user.id].req = True
     marker[message.from_user.id].datereq = True
     marker[message.from_user.id].date = ""
@@ -59,6 +66,40 @@ def markAttendance(message):
     print(marker)
     print(userImgs)
     return
+class get:
+    req=False
+@bot.message_handler(commands=["authenticate"])
+def authentication(message):
+    c=get()
+    c.req=True
+    bot.send_message(message.chat.id,"Enter vjit provided password:")
+    def password(message):
+        if c.req :
+            c.req = False
+            return True
+        else:
+            return False
+
+    @bot.message_handler(func=password)
+    def authenticator(message):
+        if message.text==key.password:
+            with open('resources\\user_ids.txt', 'a') as tfile:
+                if len(authIds) == 1:
+                    tfile.write(str(message.from_user.id))
+                    authIds[0]=str(message.from_user.id)
+                else:
+                    tfile.write("," + str(message.from_user.id))
+                    authIds.append(str(message.from_user.id))
+            bot.send_message(message.chat.id, "Great you are authenticated \U0001F44D")
+            return
+        else:
+            bot.send_message(message.chat.id, "You entered wrong password \U0001F44E")
+            return
+
+
+
+
+
 def dateParse(message):
 
     if len(message.text.split('/')) == 3 and marker[message.from_user.id].datereq:
@@ -156,7 +197,9 @@ def returnMarked(message):
 
 @bot.message_handler(commands=["getAttendance"])
 def getAttendance(message1):
+    marker[message1.from_user.id] = count()
     attender[message1.from_user.id] = attendance()
+    userImgs[message1.from_user.id] = []
     bot.send_message(message1.chat.id, "enter class name")
     class i:
         c = True
@@ -170,7 +213,7 @@ def getAttendance(message1):
             return False
     @bot.message_handler(func=section)
     def retrieveAttendance(message):
-        marked=attender.getAttendance(i.sec)
+        marked=attender[message1.from_user.id].getAttendance(i.sec)
         bot.send_message(message.chat.id, marked)
 
 bot.polling()

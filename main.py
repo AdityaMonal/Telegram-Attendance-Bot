@@ -81,12 +81,12 @@ class attendance:
         print(self.classNames)
         print(self.encodeListKnown)
 
-    def execute(self, start=1, end=1, dat=""):
+    def execute(self, imgs, dat=""):
         inpPath = self.path+"\input_images"
         myInps = os.listdir(inpPath)
         # print(myInps)
-        marked=[]
-        for cl in range(start, end+1):
+        marked = []
+        for cl in imgs:
             # print(os.path.splitext(cl)[0])
             # fileno = int(os.path.splitext(cl)[0][5:])
             # # print(fileno)

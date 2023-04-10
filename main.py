@@ -103,7 +103,7 @@ class attendance:
             encodesCurFrame = face_recognition.face_encodings(imgS, facesCurFrame)
 
             for encodeFace, faceLoc in zip(encodesCurFrame, facesCurFrame):
-                matches = face_recognition.compare_faces(self.encodeListKnown, encodeFace)
+                matches = face_recognition.compare_faces(self.encodeListKnown, encodeFace, 0.5)
                 faceDis = face_recognition.face_distance(self.encodeListKnown, encodeFace)
                 # print(faceDis)
                 matchIndex = np.argmin(faceDis)
@@ -113,22 +113,28 @@ class attendance:
 
                     # print(name)
 
-                    # y1, x2, y2, x1 = faceLoc
-                    # y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
-                    # cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    # cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
-                    # cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+                    y1, x2, y2, x1 = faceLoc
+                    # y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 44
+                    part = int((y2 - y1) / 6)
+                    cv2.rectangle(img, (x1, y1), (x2, y2 + part), (0, 255, 0), 2)
+                    cv2.rectangle(img, (x1, y2), (x2, y2 + part), (0, 255, 0), cv2.FILLED)
+                    cv2.putText(img, name, (x1 + int(part / 5), y2 + part - int(part / 5)), cv2.FONT_HERSHEY_DUPLEX,
+                                (1 / 35) * part, (255, 255, 255), int(part / 15))
                     if name not in marked:
                         marked.append(name)
                     if len(dat) > 0:
                         self.markAttendance(name, datetime.strptime(dat, '%d/%m/%y'))
                     else:
                         self.markAttendance(name)
-                    # while True:
-                    #     imgK = cv2.resize(imgS, (960, 540))
-                    #     cv2.imshow('lol', imgK)
-                    #     if cv2.waitKey(1) & 0xff == ord('q'):
-                    #         break
+            # while True:
+            #     imgK = cv2.resize(img, (960, 540))
+            #     cv2.imshow('lol', imgK)
+            #     if cv2.waitKey(1) & 0xff == ord('q'):
+            #         break
+            if not os.path.exists("output_images"):
+                os.mkdir("output_images")
+            pat = "output_images\image" + str(cl) + ".jpg"
+            cv2.imwrite(pat, img)
         return marked
     def getAttendance(self,sec):
         reg = {}

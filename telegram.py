@@ -36,6 +36,7 @@ class count:
     req = True
     datereq = True
     date = ""
+    response=False
 class imNo:
     i=0
 userImgs = {}
@@ -136,8 +137,21 @@ def triggerAttendance(message):
             marked += name+'\n'
         if len(marked) > 0:
             bot.send_message(message.chat.id, marked)
+            marker[message.from_user.id].response=True
+            bot.send_message(message.chat.id, "To get dected faces: /detected ")
         else:
             bot.send_message(message.chat.id, "Barrrrrh")
+
+@bot.message_handler(commands=["detected"])
+def returnMarked(message):
+    if marker[message.from_user.id].response :
+        marker[message.from_user.id].response=False
+        outPath = key.path + "\output_images"
+        for cl in userImgs[message.from_user.id]:
+            imgName = f'{outPath}\image{cl}.jpg'
+            pic = open(imgName, 'rb')
+            bot.send_photo(message.chat.id, pic)
+
 
 
 @bot.message_handler(commands=["getAttendance"])
@@ -156,7 +170,7 @@ def getAttendance(message1):
             return False
     @bot.message_handler(func=section)
     def retrieveAttendance(message):
-        marked=attender[message.from_user.id].getAttendance(i.sec)
+        marked=attender.getAttendance(i.sec)
         bot.send_message(message.chat.id, marked)
 
 bot.polling()
